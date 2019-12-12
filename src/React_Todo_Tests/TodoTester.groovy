@@ -28,11 +28,14 @@ public class TodoTester {
     private static final String URL = "https://react-redux-todomvc.stackblitz.io/";
     private static final String rootSelector = "#root"; // or is "div.todoapp" better??
     private static final String toDoInputSelector = "html > body > div > div > header > input";
-    private static final String toDoCheckboxSelector = "#root > div > section > ul > li > div > input"
-
-
-
-
+    private static final String toDoCheckboxSelector = "#root > div > section > ul > li > div > input";
+    private static final String toDoItemLabel = "#root > div > section > ul > li > div > label";
+    private static final String allButton = "#root > div > section > footer > ul > li:nth-child(1) > a";
+    private static final String activeButton = "#root > div > section > footer > ul > li:nth-child(2) > a";
+    private static final String completedButton = "#root > div > section > footer > ul > li:nth-child(3) > a";
+    private static final String deleteButton = "#root > div > section > ul > li > div > button";
+    private static final String clearCompletedButton = "#root > div > section > footer > button";
+    private static final String classEqualsCompleted = "#root > div > section > ul > li";
 
     // "Functional" objects
 
@@ -49,19 +52,22 @@ public class TodoTester {
 
     public void assertItemOnList(String task) {
         // Make sure the item is on the list
-        List<WebElement> Items = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        List<WebElement> Items = chrome.findElements(By.cssSelector(toDoItemLabel));
         assert Items[0].getText() == task;
     }
 
     public void assertItemNotActive() {
         // Make sure it is NOT on the 'Active' List - this code works b/c the last added item stays at the top of the list
-        chrome.findElement(By.xpath(("//footer/ul/li[2]/a"))).click();
-        List<WebElement> activeItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        // active button
+        chrome.findElement(By.cssSelector((activeButton))).click();
+        // to do item label
+        List<WebElement> activeItems = chrome.findElements(By.cssSelector(toDoItemLabel));
         assert activeItems[0].getText() != testTaskString;
     }
 
     public void checkToDoListForItem() {
-        List<WebElement> todoItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        // to do item label
+        List<WebElement> todoItems = chrome.findElements(By.cssSelector(toDoItemLabel));
         assertTrue(todoItems[0].getText() == testTaskString);
     }
 
@@ -72,29 +78,36 @@ public class TodoTester {
 
     public void clickCompletedAndAssert() {
         // click 'Completed', make sure item is marked 'Completed'
-        chrome.findElement(By.xpath(("//footer/ul/li[3]/a"))).click();
-        assert chrome.findElement(By.xpath("//ul[@class='todo-list']//li")).getAttribute("class") == "completed";
+        //completed button
+        chrome.findElement(By.cssSelector((completedButton))).click();
+        //classEqualsCompleted
+        assert chrome.findElement(By.cssSelector(classEqualsCompleted)).getAttribute("class") == "completed";
 
     }
 
     public void deleteItem() {
         // Performs a 'hover' to make hidden element visible, then a 'click' on said element. Taken from a SO post and modified. Make notes on this later.
         Actions action = new Actions(chrome);
-        WebElement we = chrome.findElement(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        //to do item label
+        WebElement we = chrome.findElement(By.cssSelector(toDoItemLabel));
         action.moveToElement(we).build().perform();
-        action.moveToElement(chrome.findElement(By.xpath("//ul[@class='todo-list']//div[@class='view']//button"))).click().build().perform();
+        //delete button
+        action.moveToElement(chrome.findElement(By.cssSelector(deleteButton))).click().build().perform();
     }
 
     public void deletedItemNotOnAll() {
         // Make sure it is NOT on the 'All' List - this code works b/c the last added item stays at the top of the list
-        chrome.findElement(By.xpath(("//footer/ul/li[1]/a"))).click();
-        List<WebElement> allItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        // all button
+        chrome.findElement(By.cssSelector((allButton))).click();
+        // to do item label
+        List<WebElement> allItems = chrome.findElements(By.cssSelector(toDoItemLabel));
         assert allItems[0].getText() != testTaskString;
     }
 
 
     public void clearCompleted() {
-        chrome.findElement(By.xpath(("//footer/button"))).click();
+        // clear completed button
+        chrome.findElement(By.cssSelector((clearCompletedButton))).click();
     }
 
     // ---------- Tests ----------- //
@@ -133,6 +146,7 @@ public class TodoTester {
         assertItemNotActive();
     }
 
+    //sometimes this doesn't run... doesn't fail, but gives a yellow 'circle x'
     @Test
     public void deleteActiveTodoTest() {
         openPage();
