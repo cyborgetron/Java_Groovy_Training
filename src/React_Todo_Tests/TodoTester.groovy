@@ -47,10 +47,10 @@ public class TodoTester {
         testInput.sendKeys(Keys.ENTER);
     }
 
-    public void assertItemOnList() {
+    public void assertItemOnList(String task) {
         // Make sure the item is on the list
-        List<WebElement> completedItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
-        assert completedItems[0].getText() == testTaskString;
+        List<WebElement> Items = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        assert Items[0].getText() == task;
     }
 
     public void assertItemNotActive() {
@@ -70,7 +70,7 @@ public class TodoTester {
         checkboxEls[0].click();
     }
 
-    public void clickCheckboxAndAssert() {
+    public void clickCompletedAndAssert() {
         // click 'Completed', make sure item is marked 'Completed'
         chrome.findElement(By.xpath(("//footer/ul/li[3]/a"))).click();
         assert chrome.findElement(By.xpath("//ul[@class='todo-list']//li")).getAttribute("class") == "completed";
@@ -84,6 +84,14 @@ public class TodoTester {
         action.moveToElement(we).build().perform();
         action.moveToElement(chrome.findElement(By.xpath("//ul[@class='todo-list']//div[@class='view']//button"))).click().build().perform();
     }
+
+    public void deletedItemNotOnAll() {
+        // Make sure it is NOT on the 'All' List - this code works b/c the last added item stays at the top of the list
+        chrome.findElement(By.xpath(("//footer/ul/li[1]/a"))).click();
+        List<WebElement> allItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
+        assert allItems[0].getText() != testTaskString;
+    }
+
 
     public void clearCompleted() {
         chrome.findElement(By.xpath(("//footer/button"))).click();
@@ -120,8 +128,8 @@ public class TodoTester {
         openPage();
         addItem(testTaskString);
         completeItem();
-        clickCheckboxAndAssert();
-        assertItemOnList();
+        clickCompletedAndAssert();
+        assertItemOnList(testTaskString);
         assertItemNotActive();
     }
 
@@ -130,11 +138,7 @@ public class TodoTester {
         openPage();
         addItem(testTaskString);
         deleteItem();
-
-        // Make sure it is NOT on the 'All' List - this code works b/c the last added item stays at the top of the list
-        chrome.findElement(By.xpath(("//footer/ul/li[1]/a"))).click();
-        List<WebElement> allItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
-        assert allItems[0].getText() != testTaskString;
+        deletedItemNotOnAll();
     }
 
     @Test
@@ -143,11 +147,7 @@ public class TodoTester {
         addItem(testTaskString);
         completeItem();
         deleteItem();
-
-        // Make sure it is NOT on the 'All' List - this code works b/c the last added item stays at the top of the list
-        chrome.findElement(By.xpath(("//footer/ul/li[1]/a"))).click();
-        List<WebElement> allItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
-        assert allItems[0].getText() != testTaskString;
+        deletedItemNotOnAll();
     }
 
     @Test
@@ -156,22 +156,10 @@ public class TodoTester {
         addItem(testTaskString);
         completeItem();
         addItem(testTaskString1)
-
-        // click 'Completed', make sure item is marked 'Completed'
-        chrome.findElement(By.xpath(("//footer/ul/li[3]/a"))).click();
-        assert chrome.findElement(By.xpath("//ul[@class='todo-list']//li")).getAttribute("class") == "completed";
-
-        // Make sure the item is on the list
-        List<WebElement> completedItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
-        assert completedItems[0].getText() == testTaskString;
-
+        clickCompletedAndAssert();
+        assertItemOnList(testTaskString);
         clearCompleted();
-
-        // ensure "test task" is not on the 'all' list after being completed and cleared
-        chrome.findElement(By.xpath(("//footer/ul/li[1]/a"))).click();
-        List<WebElement> allItems = chrome.findElements(By.xpath("//ul[@class='todo-list']//div[@class='view']//label"));
-        assert allItems[0].getText() != testTaskString;
-        // ensure "test task 2" is still on the 'all' list
-        assert allItems[0].getText() == testTaskString1;
+        deletedItemNotOnAll();
+        assertItemOnList(testTaskString1);
     }
 }
