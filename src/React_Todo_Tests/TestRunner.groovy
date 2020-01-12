@@ -7,10 +7,10 @@ import org.junit.runner.notification.Failure
 
 public class TestRunner {
     public static void main(String[] args) {
-        Result result = JUnitCore.runClasses(TodoTester.class);
+        Result result = JUnitCore.runClasses(BetterTester.class);
         for (Failure failure : result.getFailures()) {
             System.out.println(failure.toString());
         }
-        System.out.println("Result=="+result.wasSuccessful());
+        System.out.println("Testing passed: "+result.wasSuccessful());
     }
 }
