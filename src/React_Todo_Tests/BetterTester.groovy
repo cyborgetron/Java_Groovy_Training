@@ -39,18 +39,25 @@ class BetterTester {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
         pageModel.addItem(testTaskString);
-        pageModel.checkToDoListForItem(testTaskString);
+        pageModel.assertItemOnList(testTaskString);
     }
 
     @Test
     public void completeTodoTest() {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
+        // size should be (1) item, before adding new item
+        assert pageModel.getAllItems().size() == 1
+
         pageModel.addItem(testTaskString);
-        pageModel.completeItem();
-        pageModel.clickCompletedAndAssert();
+        // size should now be (2) items
+        assert pageModel.getAllItems().size() == 2
+
+        pageModel.completeItem(0);
+        pageModel.clickCompletedButton()
         pageModel.assertItemOnList(testTaskString);
-        pageModel.assertItemNotActive(testTaskString);
+        pageModel.clickActiveButton()
+        pageModel.assertItemNotOnList(testTaskString);
     }
 
     //sometimes this doesn't run... doesn't fail, but gives a yellow 'circle x'
@@ -59,8 +66,9 @@ class BetterTester {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
         pageModel.addItem(testTaskString);
-        pageModel.deleteItem();
-        pageModel.deletedItemNotOnAll(testTaskString);
+        pageModel.deleteItem(0);
+        pageModel.clickAllButton()
+        pageModel.assertItemNotOnList(testTaskString);
     }
 
     // occasionally this will run and give me a yellow 'x'; not sure what that's about
@@ -69,9 +77,10 @@ class BetterTester {
         PageModel pageModel = new PageModel();
         pageModel.openPage(chrome);
         pageModel.addItem(testTaskString);
-        pageModel.completeItem();
+        pageModel.completeItem(0);
         pageModel.deleteItem();
-        pageModel.deletedItemNotOnAll(testTaskString);
+        pageModel.clickAllButton()
+        pageModel.assertItemNotOnList(testTaskString);
     }
 
     @Test
@@ -79,12 +88,18 @@ class BetterTester {
         PageModel pageModel = new PageModel();
         pageModel.openPage(chrome);
         pageModel.addItem(testTaskString);
-        pageModel.completeItem();
         pageModel.addItem(testTaskString1)
-        pageModel.clickCompletedAndAssert();
+
+        // complete "testTaskString"
+        pageModel.completeItem(1);
+        pageModel.clickCompletedButton()
+
         pageModel.assertItemOnList(testTaskString);
         pageModel.clearCompleted();
-        pageModel.deletedItemNotOnAll(testTaskString);
+        pageModel.clickAllButton()
+
+        
+        pageModel.assertItemNotOnList(testTaskString);
         pageModel.assertItemOnList(testTaskString1);
     }
 }
