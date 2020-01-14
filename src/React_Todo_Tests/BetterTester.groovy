@@ -32,13 +32,27 @@ class BetterTester {
     public void getPageTest() {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
+
+        assert pageModel.getHeader().getText() == "todos"
+
+        // insures "items left" is working
+        assert pageModel.getItemsLeft().getText() == "1"
+
+        // This seems useful and I wanted to try it
+        pageModel.completeItem(0)
+        // gets the text of the task
+        assert pageModel.getOneItem(0).getText() == "Use Redux"
+        // gets the class - "view" is active, "completed" is complete
+        assert pageModel.getOneItem(0).getAttribute("class") == "completed"
     }
 
     @Test
     public void checkItemTest() {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
+        assert pageModel.getAllItems().size() == 1
         pageModel.addItem(testTaskString);
+        assert pageModel.getAllItems().size() == 2
         pageModel.assertItemOnList(testTaskString);
     }
 
@@ -65,18 +79,27 @@ class BetterTester {
     public void deleteActiveTodoTest() {
         PageModel pageModel = new PageModel()
         pageModel.openPage(chrome);
+
+        assert pageModel.getAllItems().size() == 1
         pageModel.addItem(testTaskString);
+        assert pageModel.getAllItems().size() == 2
+
         pageModel.deleteItem(0);
         pageModel.clickAllButton()
         pageModel.assertItemNotOnList(testTaskString);
+        assert pageModel.getAllItems().size() == 1
     }
 
-    // occasionally this will run and give me a yellow 'x'; not sure what that's about
+
     @Test
     public void deleteCompletedTodoTest() {
         PageModel pageModel = new PageModel();
         pageModel.openPage(chrome);
+
+        assert pageModel.getAllItems().size() == 1
         pageModel.addItem(testTaskString);
+        assert pageModel.getAllItems().size() == 2
+
         pageModel.completeItem(0);
         pageModel.deleteItem(0);
         pageModel.clickAllButton()
@@ -87,17 +110,20 @@ class BetterTester {
     public void clearCompletedTest() {
         PageModel pageModel = new PageModel();
         pageModel.openPage(chrome);
+
+        assert pageModel.getAllItems().size == 1
         pageModel.addItem(testTaskString);
         pageModel.addItem(testTaskString1)
+        assert pageModel.getAllItems().size() == 3
 
-        // complete "testTaskString"
+        // complete "testTaskString" todo
         pageModel.completeItem(1);
         pageModel.clickCompletedButton()
+        assert pageModel.getAllItems().size() == 1
 
         pageModel.assertItemOnList(testTaskString);
         pageModel.clearCompleted();
         pageModel.clickAllButton()
-
 
         pageModel.assertItemNotOnList(testTaskString);
         pageModel.assertItemOnList(testTaskString1);
