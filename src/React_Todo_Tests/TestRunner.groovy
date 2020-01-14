@@ -11,6 +11,6 @@ public class TestRunner {
         for (Failure failure : result.getFailures()) {
             System.out.println(failure.toString());
         }
-        System.out.println("Testing passed: "+result.wasSuccessful());
+        System.out.println("Testing passed: " + result.wasSuccessful());
     }
 }

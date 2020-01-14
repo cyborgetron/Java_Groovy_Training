@@ -78,7 +78,7 @@ class BetterTester {
         pageModel.openPage(chrome);
         pageModel.addItem(testTaskString);
         pageModel.completeItem(0);
-        pageModel.deleteItem();
+        pageModel.deleteItem(0);
         pageModel.clickAllButton()
         pageModel.assertItemNotOnList(testTaskString);
     }
@@ -98,7 +98,7 @@ class BetterTester {
         pageModel.clearCompleted();
         pageModel.clickAllButton()
 
-        
+
         pageModel.assertItemNotOnList(testTaskString);
         pageModel.assertItemOnList(testTaskString1);
     }
