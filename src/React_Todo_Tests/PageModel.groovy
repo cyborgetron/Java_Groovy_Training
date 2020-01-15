@@ -16,8 +16,6 @@ import static org.junit.matchers.JUnitMatchers.*;
 
 class PageModel {
 
-
-    // page model... sorta?
     private static final String URL = "https://react-redux-todomvc.stackblitz.io/";
     private static final String rootSelector = "#root"; // or is "div.todoapp" better??
     private static final String toDoInputSelector = ".header > .new-todo";
@@ -32,8 +30,6 @@ class PageModel {
 
     private static final String header = "div > header > h1" // check header equals todo
 
-
-
     private static WebDriver driver
 
     // Methods
@@ -41,14 +37,14 @@ class PageModel {
     public openPage(WebDriver driver) {
         driver.get(URL)
         this.driver = driver
-        WebDriverWait wait = new WebDriverWait(driver, 30);
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(rootSelector)));
+        WebDriverWait wait = new WebDriverWait(driver, 30)
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(rootSelector)))
     }
 
     public void addItem(String task) {
-        WebElement testInput = driver.findElement(By.cssSelector(toDoInputSelector));
-        testInput.sendKeys(task);
-        testInput.sendKeys(Keys.ENTER);
+        WebElement testInput = driver.findElement(By.cssSelector(toDoInputSelector))
+        testInput.sendKeys(task)
+        testInput.sendKeys(Keys.ENTER)
     }
 
 
@@ -56,7 +52,7 @@ class PageModel {
     // need to find something that works like Hamcrest 'assert (has item())'
     public void assertItemOnList(String task) {
         int ticker = 0
-        List<WebElement> allItems = driver.findElements(By.cssSelector(toDoItemLabel));
+        List<WebElement> allItems = driver.findElements(By.cssSelector(toDoItemLabel))
         for (WebElement i in allItems)
         { if (i.getText() == task)
             {ticker += 1}
@@ -68,45 +64,51 @@ class PageModel {
     public void assertItemNotOnList(String task) {
         // this code works b/c the last added item stays at the top of the list
         // to do item label
-        List<WebElement> allItems = driver.findElements(By.cssSelector(fullList));
+        List<WebElement> allItems = driver.findElements(By.cssSelector(fullList))
         for (WebElement i in allItems)
-        assert i.getText() != task;
+        assert i.getText() != task
     }
 
-    public void clickActiveButton() {
+    public void showActive() {
         // all button
-        driver.findElement(By.cssSelector((activeButton))).click();
+        driver.findElement(By.cssSelector((activeButton))).click()
     }
 
     public void clickAllButton() {
         // all button
-        driver.findElement(By.cssSelector((allButton))).click();
+        driver.findElement(By.cssSelector((allButton))).click()
     }
 
     public void clickCompletedButton() {
         //completed button
-        driver.findElement(By.cssSelector(completedButton)).click();
+        driver.findElement(By.cssSelector(completedButton)).click()
 
     }
 
     public void completeItem(int taskNumber) {
-        driver.findElement(By.cssSelector("#root > div > section > ul > li:nth-child(" + (taskNumber + 1) + ")> div > input")).click();
+        driver.findElement(By.cssSelector("#root > div > section > ul > li:nth-child(" + (taskNumber + 1) + ")> div > input")).click()
     }
 
 
     public void deleteItem(int taskNumber) {
         // Performs a 'hover' to make hidden element visible, then a 'click' on said element. Taken from a SO post and modified. Make notes on this later.
-        Actions action = new Actions(driver);
+        Actions action = new Actions(driver)
         //to do item label
-        WebElement we = driver.findElement(By.cssSelector("#root > div > section > ul > li:nth-child(" + (taskNumber + 1) + ")"));
-        action.moveToElement(we).build().perform();
+        WebElement we = this.getAllItems()[taskNumber]
+        action.moveToElement(we).build().perform()
         //delete button
-        action.moveToElement(driver.findElement(By.cssSelector(".destroy"))).click().build().perform();
+        action.moveToElement(driver.findElement(By.cssSelector(".destroy"))).click().build().perform()
     }
 
     public void clearCompleted() {
         // clear completed button
-        driver.findElement(By.cssSelector((clearCompletedButton))).click();
+        driver.findElement(By.cssSelector((clearCompletedButton))).click()
+    }
+
+    public WebElement findElementByText(String taskName) {
+        List <WebElement> elements = this.getAllItems()
+        return elements
+                .find({ webElement -> Objects.equals(webElement.getText(), taskName) })
     }
 
     public WebElement getHeader() {
@@ -120,13 +122,8 @@ class PageModel {
     }
 
     public WebElement getItemsLeft() {
-        List<WebElement> itemsLeft = driver.findElements(By.cssSelector(itemsLeftCount))
-        // Even though this is Array Typed, it is a 1x1 array
-        return itemsLeft[0]
+        WebElement itemsLeft = driver.findElement(By.cssSelector(itemsLeftCount))
+        return itemsLeft
     }
 
-    public WebElement getOneItem(int taskNumber){
-        List<WebElement> allItems = driver.findElements(By.cssSelector(fullList))
-        return allItems[taskNumber]
-    }
 }
